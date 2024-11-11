@@ -4,9 +4,13 @@ from pydantic import BaseModel
 from typing import Annotated
 import shutil
 
+from routers.users import router as users_router
+
 ##################################### definitions #####################################
 
 app = FastAPI()
+
+app.include_router(users_router, prefix="/users", tags=["users"])
 
 # basic user model
 class UserModel(BaseModel):
@@ -17,6 +21,10 @@ class UserModel(BaseModel):
 class AccType(str, Enum):
     ADMIN = "admin"
     USER = "user"
+
+# dependency
+async def pagination(q: str | None = None, skip: int = 0, limit: int = 100):
+    return {"q": q, "skip": skip, "limit": limit}
 
 ##################################### methods #####################################
 
@@ -45,12 +53,17 @@ async def user_by_money(min_m: int = 0, max_m: int = 100000):
 async def user(id: int, acc_type: AccType):
     return {"user_id": id, "acc_type": acc_type}
 
+# get users depending on pagination
+@app.get("/users")
+async def read_users(commons: Annotated[dict, Depends(pagination)]):
+    return commons
+
 # adds new user with restriction to username
 @app.post("/users")
 async def new_user(data: UserModel):
     if data.username == "admin":
         raise HTTPException(
-            status.HTTP_406_NOT_ACCEPTABLE, detail="Can"t create user with this name"
+            status.HTTP_406_NOT_ACCEPTABLE, detail="Can't create user with this name"
         )
     return {"message": data}
 

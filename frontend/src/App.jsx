@@ -1,9 +1,28 @@
+import { useState, useEffect } from "react";
+import Header from "./components/Header";
+import Card from "./components/Card";
+import Button from "./components/Button";
+
 export default function App() {
+  const [users, setUsers] = useState([]);
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+  const fetchUsers = () => {
+    fetch("https://jsonplaceholder.typicode.com/users")
+      .then((res) => res.json())
+      .then((data) => setUsers(data));
+  };
   return (
-    <div className="bg-purple-800 text-white min-h-screen p-4 flex flex-col justify-center  items-center">
-      <h1 className="text-3xl font-thin">
-        Hello FARM stack!
-      </h1>
+    <div className="bg-purple-800 text-white min-h-screen p-4 flex flex-col items-center">
+      <h2 className="mb-4">List of users</h2>
+      <div className="grid grid-cols-3 gap-4">
+        <ol>
+          {users.map((user) => (
+            <li key={user.id}>{user.name}</li>
+          ))}
+        </ol>
+      </div>
     </div>
-  )
+  );
 }

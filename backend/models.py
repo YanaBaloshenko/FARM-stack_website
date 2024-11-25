@@ -49,20 +49,22 @@ class Login(BaseModel):
 class CurrentUser(BaseModel):
     id: PyObjectId = Field(alias="_id", default=None)
     username: str = Field(...)
+    name: str = Field(...)
+    email: str = Field(...)
 
 class UpdateUser(BaseModel):
-    username: Optional[str] = None
-    password: Optional[str] = None
-    name: Optional[str] = Field(...)
-    email: Optional[str] = Field(...)
+    # username: Optional[str] = None
+    # password: Optional[str] = None
+    name: str | None = None
+    email: str | None = None
 
     model_config = ConfigDict(
         populate_by_name=True,
         arbitrary_types_allowed=True,
         json_schema_extra={
             "example": {
-                "username": "username",
-                "password": "insecurepassword",
+                # "username": "username",
+                # "password": "insecurepassword",
                 "name": "Some One",
                 "email": "example@email.example",
             }

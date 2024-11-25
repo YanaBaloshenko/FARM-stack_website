@@ -6,6 +6,7 @@ import RootLayout from "./layouts/RootLayout"
 import Home from "./pages/Home"
 import UserPage from "./pages/UserPage";
 import Login from "./pages/Login"
+import NotFound from "./pages/NotFound"
 import { AuthProvider } from "./contexts/AuthContext"
 
 
@@ -22,9 +23,9 @@ const router = createBrowserRouter(
   createRoutesFromElements(
     // routes correspond and map a component
     <Route path="/" element={<RootLayout />}>
-      <Route path="login" element={<Login />} />
       {/* <Route element={<AuthRequired />}> ... </Route> */} {/* protecting a page */} 
-      <Route path="user" element={<UserPage />} />
+      <Route path="/user" element={<UserPage />} />
+      <Route path="/login" element={<Login />} />
       <Route path="*" element={<NotFound />} />
     </Route>
   )

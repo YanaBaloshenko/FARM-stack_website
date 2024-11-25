@@ -1,11 +1,11 @@
 import { useForm } from "react-hook-form"
-// import { z } from "zod";
-const { z } = require("zod");
+import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 
 const schema = z.object({
-  username: z.string().min(4, 'Username must be at least 4 characters long').max(10, 'Username cannot exceed 10 characters'),
+  username: z.string().min(3, 'Username must be at least 3 characters long').max(10, 'Username cannot exceed 10 characters'),
   password: z.string().min(4, 'Password must be at least 4 characters long').max(10, 'Password cannot exceed 10 characters'),
 });
 
@@ -14,13 +14,14 @@ const LoginForm = () => {
             resolver: zodResolver(schema),
         });
 
+    const navigate = useNavigate();
+
     const { login, message } = useAuth();
 
     const onSubmitForm = async (data) => {
         const result = await login(data.username, data.password);
         if (result.token) {
-        // Po pomyślnym logowaniu, przekierowanie na stronę użytkownika
-            navigate("/user");
+          navigate("/user");
         }
     };
 

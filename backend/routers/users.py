@@ -79,12 +79,16 @@ async def update_user(
         id = ObjectId(current_user_data["user_id"])
     except Exception:
         raise HTTPException(status_code=404, detail=f"User not found")
+    
     user = await users.find_one({"_id": id})
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     
     # prepare data for updating
     update_data = user_data.model_dump(exclude_unset=True)
+
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No data provided to update")
 
     # update user in db
     updated_user = await users.update_one({"_id": id}, {"$set": update_data})
@@ -93,6 +97,9 @@ async def update_user(
         raise HTTPException(status_code=400, detail="No updates made")
     
     updated_user_data = await users.find_one({"_id": id})
+
+    if updated_user_data:
+        updated_user_data["_id"] = str(updated_user_data["_id"])
 
     return updated_user_data
 

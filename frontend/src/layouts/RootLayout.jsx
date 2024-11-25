@@ -5,19 +5,15 @@ const RootLayout = () => {
     const { user, message, logout } = useAuth();
     
     return (
-      <div className="bg-blue-200 min-h-screen p-2">
-        <h2>RootLayout</h2>
+      <div className="bg-white min-h-screen p-2">
         <p className="text-red-500 p-2 border">{message}</p>
-        <p>Username: {user}</p>
         
         <header className="p-8 w-full">
           <nav className="flex flex-row justify-between mx-auto">
             <div className="flex flex-row space-x-3">
-              <NavLink to="/">Home</NavLink>
               {user ? (
                 <>
-                  <NavLink to="/user">UserPage</NavLink>
-                  <button onClick={logout}>Logout</button>
+                  <NavLink to="/user">User Profile</NavLink>
                 </>
               ) : (
                 <NavLink to="/login">Login</NavLink>
@@ -29,6 +25,7 @@ const RootLayout = () => {
         <main className="p-8 flex flex-col flex-1 bg-white">
           <Outlet />
         </main>
+        <button className="p-2 bg-blue-200 border" onClick={logout} style={{ marginLeft: '30px' }}>Logout</button>
       </div>
     );
 };

@@ -11,9 +11,11 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         // checks if there's jwt token stored
         const storedJwt = localStorage.getItem('jwt');
+
         // if stored jwt is present
         if(storedJwt) {
             setJwt(storedJwt);
+
             // api call to fastapi server to determine if token returns a valid user
             fetch(`${import.meta.env.VITE_API_URL}/users/me`, {
                 headers: {
@@ -25,7 +27,7 @@ export const AuthProvider = ({ children }) => {
                 .then(data => {
 
                     if (data.username) {
-                        setUser({ user: data.username });
+                        setUser(data.username);
                         setMessage(`Welcome back, ${data.username}!`);
                     }
 
@@ -65,7 +67,7 @@ export const AuthProvider = ({ children }) => {
             setJwt(data.token);
             localStorage.setItem('jwt', data.token);
             setUser(data.username);
-            setMessage(`Login successful: welcome  ${data.username}`);
+            setMessage(`Login successful! Welcome  ${data.username}`);
         } else {
             setMessage('Login failed: ' + data.detail);
             setUser(null);

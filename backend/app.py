@@ -1,48 +1,74 @@
+import shutil
+import os
+from dotenv import load_dotenv
 from enum import Enum
-from fastapi import FastAPI, Body, Request, Header, Form, File, UploadFile, status, HTTPException, Depends
-from fastapi.middleware.cors import CORSMiddleware
+from collections import defaultdict
+
 from pydantic import BaseModel
 from typing import Annotated
-import shutil
+
+from fastapi import FastAPI, Body, Request, Header, Form, File, UploadFile, status, HTTPException, Depends
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
+
+import asyncio
+from motor import motor_asyncio
+from motor.motor_asyncio import AsyncIOMotorClient
+
+from contextlib import asynccontextmanager
+
+# from pymongo.server_api import ServerApi
+
+#from config import BaseConfig
 
 from backend.routers.users import router as users_router
+from backend.routers.posts import router as posts_router
 
 ##################################### app setup #####################################
 
-origins = ["*"]
-app = FastAPI()
+load_dotenv()
+
+#settings = BaseConfig()
+
+async def lifespan(app: FastAPI):
+    app.client = AsyncIOMotorClient(os.environ['MONGODB_HOST'])
+    app.db = app.client[os.environ['DB_NAME']]
+    try:
+        app.client.admin.command("ping")
+        print("Pinged your deployment. You have successfully connected to MongoDB!")
+        print("Mongo address:", os.environ['MONGODB_HOST'])
+    except Exception as e:
+        print(e)
+    yield
+    app.client.close()
+app = FastAPI(lifespan=lifespan)
+
 # middleware to connect with React frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(posts_router, prefix="/posts", tags=["posts"])
 app.include_router(users_router, prefix="/users", tags=["users"])
 
-##################################### definitions #####################################
+@app.get("/")
+async def get_root():
+    return {"Message": "Root working!"}
 
-# # basic user model
-# class UserModel(BaseModel):
-#     username: str
-#     name: str
+##################################### definitions #####################################
 
 # # class for defining account type - admin or user
 # class AccType(str, Enum):
 #     ADMIN = "admin"
 #     USER = "user"
 
-# # dependency
-# async def pagination(q: str | None = None, skip: int = 0, limit: int = 100):
-#     return {"q": q, "skip": skip, "limit": limit}
-
 ##################################### methods #####################################
-
-# # default get request
-# @app.get("/")
-# async def root():
-#     return {"message": "This is a default page"}
 
 # # setting a status code
 # @app.get("/status", status_code=status.HTTP_208_ALREADY_REPORTED)
@@ -53,40 +79,3 @@ app.include_router(users_router, prefix="/users", tags=["users"])
 # @app.get("/headers")
 # async def read_headers(user_agent: Annotated[str | None, Header()] = None):
 #     return {"user_agent": user_agent}
-
-# # gives users who have certain parameters within a given limit
-# @app.get("/user/money")
-# async def user_by_money(min_m: int = 0, max_m: int = 100000):
-#     return {"message": f"Listing users with money between {min_m} and {max_m}"}
-
-# # gets the user profile based on id
-# @app.get("/{acc_type}/{id}")
-# async def user(id: int, acc_type: AccType):
-#     return {"user_id": id, "acc_type": acc_type}
-
-# # get users depending on pagination
-# @app.get("/users")
-# async def read_users(commons: Annotated[dict, Depends(pagination)]):
-#     return commons
-
-# # adds new user with restriction to username
-# @app.post("/users")
-# async def new_user(data: UserModel):
-#     if data.username == "admin":
-#         raise HTTPException(
-#             status.HTTP_406_NOT_ACCEPTABLE, detail="Can't create user with this name"
-#         )
-#     return {"message": data}
-
-# # uploading files
-# @app.post("/upload")
-# async def upload(
-#     picture: UploadFile = File(...),
-#     brand: str = Form(...),
-#     model: str = Form(...)):
-#     with open("saved_file.png", "wb") as buffer:
-#         shutil.copyfileobj(picture.file, buffer)
-#     return {"brand": brand, "model": model, "file_name": picture.filename}
-# # async def upload(
-# #     file: UploadFile = File(...), brand: str = Form(...), model: str = Form(...)):
-# #     return {"brand": brand, "model": model, "file_name": file.filename}

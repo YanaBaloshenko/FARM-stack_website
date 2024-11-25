@@ -18,15 +18,13 @@ class AuthHandler:
     
     # verifies that the hash of plain pass in equal to hashed pass
     def verify_password(
-            self,
-            plain_password: str,
-            hashed_password: str) -> bool:
+            self, plain_password: str, hashed_password: str) -> bool:
         return self.pwd_context.verify(
             plain_password, hashed_password
         )
     
     # creating an encoded jwt token
-    def encode_token(self, user_id: int, username: str) -> str:
+    def encode_token(self, user_id, username: str) -> str:
         payload = {
             # expiration time
             "exp": datetime.datetime.now(datetime.timezone.utc)
@@ -43,9 +41,7 @@ class AuthHandler:
         try:
             # token to decode using secret and algorithm used to encode
             payload = jwt.decode(
-                token,
-                self.secret,
-                algorithms=["HS256"])
+                token, self.secret, algorithms=["HS256"])
             # return only encoded data in sub section
             return payload["sub"]
         # give error if token is expired

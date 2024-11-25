@@ -23,9 +23,9 @@ async def update_user(
         id = ObjectId(id)
     except Exception:
         raise HTTPException(status_code=404, detail=f"Car {id} not found")
-    car = {
+    user = {
         k: v
-        for k, v in car.model_dump(by_alias=True).items()
+        for k, v in user.model_dump(by_alias=True).items()
         if v is not None and k != "_id"
     }
 

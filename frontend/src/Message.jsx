@@ -1,4 +1,4 @@
-import { useAuth } from "./AuthContext";
+import { useAuth } from "./contexts/AuthContext";
 
 const Message = () => {
     const { message } = useAuth()

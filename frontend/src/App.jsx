@@ -1,32 +1,69 @@
 import { useState, useEffect } from 'react';
-import { AuthProvider } from './AuthContext';
+import { AuthProvider } from './contexts/AuthContext';
 
 import Register from './Register'
 import Login from './Login'
 import Users from './Users'
 import Message from './Message'
 
-const App = () => {
+import {
+  createBrowserRouter,
+  Route,
+  createRoutesFromElements,
+  RouterProvider
+} from 'react-router-dom'
 
-  const [showLogin, setShowLogin] = useState(true)
+import RootLayout from "./layouts/RootLayout"
+import Home from "./pages/Home"
+import Login from "./pages/Login"
+import { AuthProvider } from "./contexts/AuthContext"
 
+
+// ################################ App ################################
+
+// creating the router
+const router = createBrowserRouter(
+  // invoking the function that creates the actual routes
+  createRoutesFromElements(
+    // routes correspond and map a component
+    <Route path="/" element={<RootLayout />}>
+      <Route path="login" element={<Login />} />
+      {/* <Route element={<AuthRequired />}> ... </Route> */} {/* protecting a page */} 
+      <Route index element={<Home />} />
+      <Route path="*" element={<NotFound />} />
+    </Route>
+  )
+)
+
+export default function App() {
   return (
-    <div className="bg-blue-200 flex flex-col justify-center items-center min-h-screen">
-      <AuthProvider>
-        <h1 className="text-2xl text-blue-800"> Simple Auth App </h1>
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
+  )
+}
 
-        <Message />
-        <div>
-          {showLogin ? <Login /> : <Register />}
-          <button onClick={() => setShowLogin(!showLogin)}>{showLogin ? 'Register' : 'Login'}</button>
-          <hr />
-        </div>
-        <Users />
-      </AuthProvider>
-    </div>
-  );
-};
-export default App
+// const App = () => {
+
+//   const [showLogin, setShowLogin] = useState(true)
+
+//   return (
+//     <div className="bg-blue-200 flex flex-col justify-center items-center min-h-screen">
+//       <AuthProvider>
+//         <h1 className="text-2xl text-blue-800"> Simple Auth App </h1>
+
+//         <Message />
+//         <div>
+//           {showLogin ? <Login /> : <Register />}
+//           <button onClick={() => setShowLogin(!showLogin)}>{showLogin ? 'Register' : 'Login'}</button>
+//           <hr />
+//         </div>
+//         <Users />
+//       </AuthProvider>
+//     </div>
+//   );
+// };
+// export default App
 
 // export default function App() {
 //   const [users, setUsers] = useState([]);

@@ -13,63 +13,40 @@ router = APIRouter()
 # auth handler may comment out or change for testing w/o jwt
 auth_handler = AuthHandler()
 
-@router.put()
-async def update_user(
-    id: str,
-    request: Request,
-    user: UpdateUser = Body(...),
-):
-    try:
-        id = ObjectId(id)
-    except Exception:
-        raise HTTPException(status_code=404, detail=f"Car {id} not found")
-    user = {
-        k: v
-        for k, v in user.model_dump(by_alias=True).items()
-        if v is not None and k != "_id"
-    }
-
 ################################ post methods ################################
 @router.post("/register", response_description="Register user")
 async def register(request: Request, newUser: Login = Body(...)) -> User:
-    # loading all the users from db
     users = request.app.db["users"]
-    # getting hash of the password new user gave
+    # hash the password before inserting it into MongoDB
     newUser.password = auth_handler.get_password_hash(newUser.password)
-    # throwing an error if username exists in db
-    if (# existing_username :=
-        await users.find_one({"username": newUser["username"]})
+    newUser = newUser.model_dump()
+    # check existing user or email 409 Conflict:
+    if (
+        existing_username := await users.find_one({"username": newUser["username"]})
         is not None
     ):
         raise HTTPException(
             status_code=409,
-            detail="Username already taken"
+            detail=f"User with username {newUser['username']} already exists",
         )
-    # adding new user to a db
     new_user = await users.insert_one(newUser)
     created_user = await users.find_one({"_id": new_user.inserted_id})
     return created_user
 
 @router.post("/login", response_description="Login user")
 async def login(request: Request, loginUser: Login = Body(...)) -> str:
-    # reading users from db
     users = request.app.db["users"]
-    # checks users till it gets to given username
     user = await users.find_one({"username": loginUser.username})
-    # error if there's no such user or passwd is wrong
     if (user is None) or (
         not auth_handler.verify_password(loginUser.password, user["password"])
     ):
         raise HTTPException(status_code=401, detail="Invalid username and/or password")
-    # creates a token
     token = auth_handler.encode_token(str(user["_id"]), user["username"])
-    # gives a response based on token
     response = JSONResponse(
-        content={
-            "token": token,
-            "username": user["username"]
-        }
-    )
+    content={
+        "token": token,
+        "username": user["username"]
+    })
     return response
 
 ################################ get methods ################################
@@ -88,6 +65,36 @@ async def me(
         {"_id": ObjectId(user_data["user_id"])}
     )
     return currentUser
+
+################################ put methods ################################
+@router.put("/me", response_description="Update user data")
+async def update_user(
+    request: Request,
+    current_user_data=Depends(auth_handler.auth_wrapper),
+    user_data: UpdateUser = Body(...),
+):
+    users = request.app.db["users"]
+
+    try:
+        id = ObjectId(current_user_data["user_id"])
+    except Exception:
+        raise HTTPException(status_code=404, detail=f"User not found")
+    user = await users.find_one({"_id": id})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # prepare data for updating
+    update_data = user_data.model_dump(exclude_unset=True)
+
+    # update user in db
+    updated_user = await users.update_one({"_id": id}, {"$set": update_data})
+
+    if updated_user.modified_count == 0:
+        raise HTTPException(status_code=400, detail="No updates made")
+    
+    updated_user_data = await users.find_one({"_id": id})
+
+    return updated_user_data
 
 # # Listing users only to authenticated ones
 # @router.get("/list", response_description="List all users")

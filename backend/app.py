@@ -24,7 +24,6 @@ from contextlib import asynccontextmanager
 #from config import BaseConfig
 
 from backend.routers.users import router as users_router
-from backend.routers.posts import router as posts_router
 
 ##################################### app setup #####################################
 
@@ -54,7 +53,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(posts_router, prefix="/posts", tags=["posts"])
 app.include_router(users_router, prefix="/users", tags=["users"])
 
 @app.get("/")

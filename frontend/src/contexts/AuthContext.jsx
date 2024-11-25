@@ -75,6 +75,25 @@ export const AuthProvider = ({ children }) => {
         return data
     };
 
+    const updateProfile = async (name, email) => {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/users/update`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${jwt}`,
+            },
+            body: JSON.stringify({ name, email }),
+        });
+    
+        const data = await response.json();
+        if (response.ok) {
+            setUser({ ...user, name, email });
+            setMessage('Profile updated successfully');
+        } else {
+            setMessage('Error updating profile');
+        }
+    };
+
     const logout = () => {
 
         setUser(null);

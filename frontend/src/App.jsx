@@ -1,25 +1,20 @@
 import { useState, useEffect } from 'react';
-import { AuthProvider } from './contexts/AuthContext';
 
-import Register from './Register'
-import Login from './Login'
-import Users from './Users'
-import Message from './Message'
-
-import {
-  createBrowserRouter,
-  Route,
-  createRoutesFromElements,
-  RouterProvider
-} from 'react-router-dom'
+import { createBrowserRouter, Route, createRoutesFromElements, RouterProvider } from 'react-router-dom'
 
 import RootLayout from "./layouts/RootLayout"
 import Home from "./pages/Home"
+import UserPage from "./pages/UserPage";
 import Login from "./pages/Login"
 import { AuthProvider } from "./contexts/AuthContext"
 
 
 // ################################ App ################################
+
+// const PrivateRoute = ({ children }) => {
+//   const { user } = useAuth();
+//   return user ? children : <Navigate to="/login" />;
+// };
 
 // creating the router
 const router = createBrowserRouter(
@@ -29,18 +24,18 @@ const router = createBrowserRouter(
     <Route path="/" element={<RootLayout />}>
       <Route path="login" element={<Login />} />
       {/* <Route element={<AuthRequired />}> ... </Route> */} {/* protecting a page */} 
-      <Route index element={<Home />} />
+      <Route path="user" element={<UserPage />} />
       <Route path="*" element={<NotFound />} />
     </Route>
   )
-)
+);
 
 export default function App() {
   return (
     <AuthProvider>
       <RouterProvider router={router} />
     </AuthProvider>
-  )
+  );
 }
 
 // const App = () => {

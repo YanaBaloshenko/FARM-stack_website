@@ -1,0 +1,14 @@
+{
+    "users": [
+        {
+            "username": "mii",
+            "password": "$2b$12$pxsSC1AYKnSYcYAjO2mOheIbFemZ9cJUIOB1.ATtO.wgy/SLp5hme",
+            "id": "ac4007c3-7fcc-40d9-8056-7a1e4e26b23a"
+        },
+        {
+            "username": "first",
+            "password": "$2b$12$c80Q2JqOXefA1sTBRx7HQO85MpEnuk8Cf1M8/ZutO2lViJdh9uzb2",
+            "id": "1f045609-ff38-46fb-b08d-635cb60f5b07"
+        }
+    ]
+}

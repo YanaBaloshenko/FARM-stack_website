@@ -39,8 +39,8 @@ class Login(BaseModel):
 class CurrentUser(BaseModel):
     id: PyObjectId = Field(alias="_id", default=None)
     username: str = Field(...)
-    name: str = Field(...)
-    email: str = Field(...)
+    name: str | None = None
+    email: str | None = None
 
 class UpdateUser(BaseModel):
     # username: Optional[str] = None

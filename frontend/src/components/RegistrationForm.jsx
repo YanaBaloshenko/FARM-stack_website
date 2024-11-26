@@ -9,19 +9,20 @@ const schema = z.object({
   password: z.string().min(4, 'Password must be at least 4 characters long').max(20, 'Password cannot exceed 20 characters'),
 });
 
-const LoginForm = () => {
+const RegistrationForm = () => {
     const { register, handleSubmit, formState: { errors } } = useForm({
             resolver: zodResolver(schema),
         });
 
     const navigate = useNavigate();
 
-    const { login, message } = useAuth();
+    const { registration, message } = useAuth();
 
     const onSubmitForm = async (data) => {
-        const result = await login(data.username, data.password);
+        const result = await registration(data.username, data.password);
+        console.log(result);
         if (result.token) {
-          navigate("/user");
+          navigate("/login");
         }
     };
 
@@ -44,7 +45,7 @@ const LoginForm = () => {
               </div>
     
               <div className="flex items-center justify-between">
-                <button type="submit">Sign In</button>
+                <button type="submit">Register</button>
               </div>
             </form>
             <p>{message}</p>
@@ -53,4 +54,4 @@ const LoginForm = () => {
     );
 };
 
-export default LoginForm
+export default RegistrationForm

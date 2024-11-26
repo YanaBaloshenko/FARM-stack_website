@@ -1,8 +1,16 @@
 import { Outlet, NavLink } from "react-router-dom"
 import { useAuth } from "../hooks/useAuth"
+import { useNavigate } from 'react-router-dom';
 
 const RootLayout = () => {
     const { user, message, logout } = useAuth();
+    const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout(); // Call logout from the auth hook
+    navigate("/login"); // Redirect after logout
+  };
+
     
     return (
       <div className="bg-white min-h-screen p-2">
@@ -16,7 +24,10 @@ const RootLayout = () => {
                   <NavLink to="/user">User Profile</NavLink>
                 </>
               ) : (
+                <>
                 <NavLink to="/login">Login</NavLink>
+                <NavLink to="/register">Register</NavLink>
+              </>
               )}
             </div>
           </nav>
@@ -25,7 +36,7 @@ const RootLayout = () => {
         <main className="p-8 flex flex-col flex-1 bg-white">
           <Outlet />
         </main>
-        <button className="p-2 bg-blue-200 border" onClick={logout} style={{ marginLeft: '30px' }}>Logout</button>
+        {user && (<button className="p-2 bg-blue-200 border" onClick={handleLogout} style={{ marginLeft: '30px' }} >Logout </button>)}
       </div>
     );
 };

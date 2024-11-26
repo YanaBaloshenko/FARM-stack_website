@@ -11,22 +11,12 @@ class User(BaseModel):
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
     username: str = Field(..., min_length=3, max_length=15)
     password: str = Field(...) # limitations?
-    name: str = Field(...)
-    email: str = Field(...)
+    name: str | None = None
+    email: str | None = None
 
     @field_validator("username")
     @classmethod
     def check_username(cls, v: str) -> str:
-        return v.title()
-    
-    @field_validator("name")
-    @classmethod
-    def check_name(cls, v: str) -> str:
-        return v.title()
-    
-    @field_validator("email")
-    @classmethod
-    def check_email(cls, v: str) -> str:
         return v.title()
     
     model_config = ConfigDict(

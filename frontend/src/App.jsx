@@ -7,6 +7,7 @@ import Home from "./pages/Home"
 import UserPage from "./pages/UserPage";
 import Login from "./pages/Login"
 import NotFound from "./pages/NotFound"
+import RegistrationPage from './pages/Registration';
 import { AuthProvider } from "./contexts/AuthContext"
 
 
@@ -26,6 +27,7 @@ const router = createBrowserRouter(
       {/* <Route element={<AuthRequired />}> ... </Route> */} {/* protecting a page */} 
       <Route path="/user" element={<UserPage />} />
       <Route path="/login" element={<Login />} />
+      <Route path="register" element={<RegistrationPage />} />
       <Route path="*" element={<NotFound />} />
     </Route>
   )

@@ -1,6 +1,6 @@
 // importing createContext
 import { createContext, useContext, useState, useEffect } from 'react';
-import { Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
@@ -96,6 +96,27 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const registration = async (username, password) => {
+
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/users/register`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password }),
+            });
+
+        const data = await response.json();
+        console.log(response)
+        if (response.ok) {
+            setMessage(`Registration successful! Please log in`);
+        } else {
+            setMessage('Registration failed: ' + data.detail);
+        }
+        return data
+    };
+
     const logout = () => {
 
         setUser(null);
@@ -104,7 +125,7 @@ export const AuthProvider = ({ children }) => {
         setMessage('Logout successful');
     };
     return (
-        <AuthContext.Provider value={{ user, jwt, login, logout, message, setMessage }}>
+        <AuthContext.Provider value={{ user, jwt, login, logout, message, setMessage, updateProfile, registration }}>
             {children}
         </AuthContext.Provider>
     );

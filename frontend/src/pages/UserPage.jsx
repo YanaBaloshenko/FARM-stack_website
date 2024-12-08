@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { AuthContext } from "../contexts/AuthContext";
 import { useAuth } from "../hooks/useAuth";
 
 const UserPage = () => {

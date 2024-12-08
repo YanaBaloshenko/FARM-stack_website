@@ -1,23 +1,13 @@
 import shutil
 import os
 from dotenv import load_dotenv
-from enum import Enum
-from collections import defaultdict
 
-from pydantic import BaseModel
-from typing import Annotated
 
-from fastapi import FastAPI, Body, Request, Header, Form, File, UploadFile, status, HTTPException, Depends
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
-from fastapi.encoders import jsonable_encoder
+from starlette.middleware.base import BaseHTTPMiddleware
 
-import asyncio
-from motor import motor_asyncio
 from motor.motor_asyncio import AsyncIOMotorClient
-
-from contextlib import asynccontextmanager
 
 # from pymongo.server_api import ServerApi
 
@@ -46,12 +36,33 @@ async def lifespan(app: FastAPI):
     app.client.close()
 app = FastAPI(lifespan=lifespan)
 
+# Middleware to add security headers
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        response = await call_next(request)
+        
+        # Add Content-Security-Policy header
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self'; "
+            "script-src 'self' 'unsafe-inline' http://localhost:8000; "
+            "style-src 'self' 'unsafe-inline'; "
+            "img-src 'self' data:; "
+            "connect-src 'self'; "
+        )
+        
+        # Add X-Frame-Options header
+        response.headers["X-Frame-Options"] = "DENY"
+        
+        return response
+
+app.add_middleware(SecurityHeadersMiddleware)
+
 # middleware to connect with React frontend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT"],
     allow_headers=["*"],
 )
 

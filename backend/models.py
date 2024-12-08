@@ -19,6 +19,11 @@ class User(BaseModel):
     def check_username(cls, v: str) -> str:
         return v.title()
     
+    @field_validator("password")
+    @classmethod
+    def check_password(cls, v: str) -> str:
+        return v.title()
+    
     model_config = ConfigDict(
         populate_by_name=True,
         arbitrary_types_allowed=True,

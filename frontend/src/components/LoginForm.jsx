@@ -6,7 +6,7 @@ import { useAuth } from "../hooks/useAuth";
 
 const schema = z.object({
   username: z.string().min(3, 'Username must be at least 3 characters long').max(10, 'Username cannot exceed 10 characters'),
-  password: z.string().min(4, 'Password must be at least 4 characters long').max(20, 'Password cannot exceed 20 characters'),
+  password: z.string().min(8, 'Password must be at least 8 characters long').max(20, 'Password cannot exceed 20 characters'),
 });
 
 const LoginForm = () => {
